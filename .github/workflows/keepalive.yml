@@ -1,0 +1,21 @@
+name: Keepalive
+
+# GitHub disables scheduled workflows after 60 days without a commit.
+on:
+  schedule:
+    - cron: "0 9 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git config user.name "keepalive"
+          git config user.email "keepalive@users.noreply.github.com"
+          git commit --allow-empty -m "Keep the schedule alive"
+          git push

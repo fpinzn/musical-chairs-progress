@@ -1,0 +1,1308 @@
+{
+ "generatedAt": "2026-09-19T21:00:00Z",
+ "project": "Barknito Musical Chairs",
+ "fixture": true,
+ "tasks": [
+  {
+   "id": "MC-001",
+   "issue": null,
+   "title": "Create the Unity project and repo",
+   "url": null,
+   "milestone": "M0",
+   "milestoneName": "M0 Foundations",
+   "status": "started",
+   "statusName": "In Progress",
+   "effort": 0.1,
+   "due": "2026-09-21",
+   "startedAt": "2026-09-19T20:00:00.000Z",
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-002",
+    "MC-003",
+    "MC-010",
+    "MC-020"
+   ],
+   "blockedBy": []
+  },
+  {
+   "id": "MC-002",
+   "issue": null,
+   "title": "Port iOS build tooling",
+   "url": null,
+   "milestone": "M0",
+   "milestoneName": "M0 Foundations",
+   "status": "started",
+   "statusName": "In Progress",
+   "effort": 0.1,
+   "due": "2026-09-21",
+   "startedAt": "2026-09-19T20:00:00.000Z",
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-025",
+    "MC-060"
+   ],
+   "blockedBy": [
+    "MC-001"
+   ]
+  },
+  {
+   "id": "MC-003",
+   "issue": null,
+   "title": "AR Foundation session and camera preview",
+   "url": null,
+   "milestone": "M0",
+   "milestoneName": "M0 Foundations",
+   "status": "started",
+   "statusName": "In Progress",
+   "effort": 0.2,
+   "due": "2026-09-21",
+   "startedAt": "2026-09-19T20:00:00.000Z",
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-004",
+    "MC-024",
+    "MC-070"
+   ],
+   "blockedBy": [
+    "MC-001"
+   ]
+  },
+  {
+   "id": "MC-004",
+   "issue": null,
+   "title": "Port the YOLO ncnn provider and bridge",
+   "url": null,
+   "milestone": "M0",
+   "milestoneName": "M0 Foundations",
+   "status": "started",
+   "statusName": "In Progress",
+   "effort": 0.2,
+   "due": "2026-09-21",
+   "startedAt": "2026-09-19T20:00:00.000Z",
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-005",
+    "MC-044"
+   ],
+   "blockedBy": [
+    "MC-003"
+   ]
+  },
+  {
+   "id": "MC-005",
+   "issue": null,
+   "title": "Sit/stand edges from the posture detector",
+   "url": null,
+   "milestone": "M0",
+   "milestoneName": "M0 Foundations",
+   "status": "started",
+   "statusName": "In Progress",
+   "effort": 0.2,
+   "due": "2026-09-21",
+   "startedAt": "2026-09-19T20:00:00.000Z",
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-007",
+    "MC-011",
+    "MC-071"
+   ],
+   "blockedBy": [
+    "MC-004"
+   ]
+  },
+  {
+   "id": "MC-007",
+   "issue": null,
+   "title": "Editor test harness and detector debug screen",
+   "url": null,
+   "milestone": "M0",
+   "milestoneName": "M0 Foundations",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.2,
+   "due": "2026-09-21",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-011",
+    "MC-093"
+   ],
+   "blockedBy": [
+    "MC-005"
+   ]
+  },
+  {
+   "id": "MC-010",
+   "issue": null,
+   "title": "Port the round state machine and its tests",
+   "url": null,
+   "milestone": "M1",
+   "milestoneName": "M1 Core loop",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.2,
+   "due": "2026-09-22",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-011",
+    "MC-012"
+   ],
+   "blockedBy": [
+    "MC-001"
+   ]
+  },
+  {
+   "id": "MC-011",
+   "issue": null,
+   "title": "GameController and run lifecycle",
+   "url": null,
+   "milestone": "M1",
+   "milestoneName": "M1 Core loop",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.3,
+   "due": "2026-09-22",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-013",
+    "MC-014",
+    "MC-042"
+   ],
+   "blockedBy": [
+    "MC-005",
+    "MC-007",
+    "MC-010"
+   ]
+  },
+  {
+   "id": "MC-012",
+   "issue": null,
+   "title": "Score formula",
+   "url": null,
+   "milestone": "M1",
+   "milestoneName": "M1 Core loop",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.1,
+   "due": "2026-09-22",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-015",
+    "MC-032"
+   ],
+   "blockedBy": [
+    "MC-010"
+   ]
+  },
+  {
+   "id": "MC-013",
+   "issue": null,
+   "title": "Game HUD to the Figma design",
+   "url": null,
+   "milestone": "M1",
+   "milestoneName": "M1 Core loop",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.6,
+   "due": "2026-09-23",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-015",
+    "MC-017",
+    "MC-018",
+    "MC-054",
+    "MC-055"
+   ],
+   "blockedBy": [
+    "MC-011"
+   ]
+  },
+  {
+   "id": "MC-014",
+   "issue": null,
+   "title": "Music, beats, SFX, haptics",
+   "url": null,
+   "milestone": "M1",
+   "milestoneName": "M1 Core loop",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.3,
+   "due": "2026-09-23",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-017",
+    "MC-018"
+   ],
+   "blockedBy": [
+    "MC-011"
+   ]
+  },
+  {
+   "id": "MC-015",
+   "issue": null,
+   "title": "Game over screen and local best score",
+   "url": null,
+   "milestone": "M1",
+   "milestoneName": "M1 Core loop",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.2,
+   "due": "2026-09-23",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-050"
+   ],
+   "blockedBy": [
+    "MC-012",
+    "MC-013"
+   ]
+  },
+  {
+   "id": "MC-016",
+   "issue": null,
+   "title": "Placeholder dog art",
+   "url": null,
+   "milestone": "M1",
+   "milestoneName": "M1 Core loop",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.3,
+   "due": "2026-09-23",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [],
+   "blockedBy": []
+  },
+  {
+   "id": "MC-017",
+   "issue": null,
+   "title": "Shake the camera when a dog is lost",
+   "url": null,
+   "milestone": "M1",
+   "milestoneName": "M1 Core loop",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.1,
+   "due": "2026-09-24",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-018"
+   ],
+   "blockedBy": [
+    "MC-013",
+    "MC-014"
+   ]
+  },
+  {
+   "id": "MC-018",
+   "issue": null,
+   "title": "Juice pass on the core loop",
+   "url": null,
+   "milestone": "M1",
+   "milestoneName": "M1 Core loop",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.3,
+   "due": "2026-09-24",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [],
+   "blockedBy": [
+    "MC-013",
+    "MC-014",
+    "MC-017"
+   ]
+  },
+  {
+   "id": "MC-020",
+   "issue": null,
+   "title": "Screen framework and design tokens",
+   "url": null,
+   "milestone": "M2",
+   "milestoneName": "M2 Onboarding, consent, account",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.1,
+   "due": "2026-09-24",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-021",
+    "MC-023",
+    "MC-035",
+    "MC-036",
+    "MC-037",
+    "MC-046"
+   ],
+   "blockedBy": [
+    "MC-001"
+   ]
+  },
+  {
+   "id": "MC-021",
+   "issue": null,
+   "title": "Splash, Requirements, Tutorial, Home screens",
+   "url": null,
+   "milestone": "M2",
+   "milestoneName": "M2 Onboarding, consent, account",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.2,
+   "due": "2026-09-24",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-042",
+    "MC-054"
+   ],
+   "blockedBy": [
+    "MC-020"
+   ]
+  },
+  {
+   "id": "MC-023",
+   "issue": null,
+   "title": "Consent screen, ConsentGate port and Firestore grants",
+   "url": null,
+   "milestone": "M2",
+   "milestoneName": "M2 Onboarding, consent, account",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.2,
+   "due": "2026-09-24",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-028",
+    "MC-040",
+    "MC-044"
+   ],
+   "blockedBy": [
+    "MC-020",
+    "MC-025"
+   ]
+  },
+  {
+   "id": "MC-024",
+   "issue": null,
+   "title": "Camera and location permissions",
+   "url": null,
+   "milestone": "M2",
+   "milestoneName": "M2 Onboarding, consent, account",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.1,
+   "due": "2026-09-24",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [],
+   "blockedBy": [
+    "MC-003"
+   ]
+  },
+  {
+   "id": "MC-025",
+   "issue": null,
+   "title": "Firebase project and anonymous auth",
+   "url": null,
+   "milestone": "M2",
+   "milestoneName": "M2 Onboarding, consent, account",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.2,
+   "due": "2026-09-24",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-023",
+    "MC-027",
+    "MC-030",
+    "MC-061",
+    "MC-063",
+    "MC-073"
+   ],
+   "blockedBy": [
+    "MC-002"
+   ]
+  },
+  {
+   "id": "MC-027",
+   "issue": null,
+   "title": "Account deletion function",
+   "url": null,
+   "milestone": "M2",
+   "milestoneName": "M2 Onboarding, consent, account",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.1,
+   "due": "2026-09-24",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-028"
+   ],
+   "blockedBy": [
+    "MC-025"
+   ]
+  },
+  {
+   "id": "MC-028",
+   "issue": null,
+   "title": "Settings screen, delete confirmation, legal pages",
+   "url": null,
+   "milestone": "M2",
+   "milestoneName": "M2 Onboarding, consent, account",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.1,
+   "due": "2026-09-24",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-060"
+   ],
+   "blockedBy": [
+    "MC-023",
+    "MC-027"
+   ]
+  },
+  {
+   "id": "MC-030",
+   "issue": null,
+   "title": "Firestore schema, rules, indexes and Functions project",
+   "url": null,
+   "milestone": "M3",
+   "milestoneName": "M3 Backend and leaderboards",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.2,
+   "due": "2026-09-25",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-031",
+    "MC-032",
+    "MC-046"
+   ],
+   "blockedBy": [
+    "MC-025"
+   ]
+  },
+  {
+   "id": "MC-031",
+   "issue": null,
+   "title": "Player profile",
+   "url": null,
+   "milestone": "M3",
+   "milestoneName": "M3 Backend and leaderboards",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.1,
+   "due": "2026-09-25",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-035"
+   ],
+   "blockedBy": [
+    "MC-030"
+   ]
+  },
+  {
+   "id": "MC-032",
+   "issue": null,
+   "title": "startRun, submitRun and anti-abuse",
+   "url": null,
+   "milestone": "M3",
+   "milestoneName": "M3 Backend and leaderboards",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.2,
+   "due": "2026-09-25",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-033",
+    "MC-034"
+   ],
+   "blockedBy": [
+    "MC-012",
+    "MC-030"
+   ]
+  },
+  {
+   "id": "MC-033",
+   "issue": null,
+   "title": "Nearby record",
+   "url": null,
+   "milestone": "M3",
+   "milestoneName": "M3 Backend and leaderboards",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.1,
+   "due": "2026-09-25",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-037"
+   ],
+   "blockedBy": [
+    "MC-032"
+   ]
+  },
+  {
+   "id": "MC-034",
+   "issue": null,
+   "title": "Global and country leaderboards",
+   "url": null,
+   "milestone": "M3",
+   "milestoneName": "M3 Backend and leaderboards",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.1,
+   "due": "2026-09-25",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-036"
+   ],
+   "blockedBy": [
+    "MC-032"
+   ]
+  },
+  {
+   "id": "MC-035",
+   "issue": null,
+   "title": "Your details screen",
+   "url": null,
+   "milestone": "M3",
+   "milestoneName": "M3 Backend and leaderboards",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.1,
+   "due": "2026-09-25",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [],
+   "blockedBy": [
+    "MC-020",
+    "MC-031"
+   ]
+  },
+  {
+   "id": "MC-036",
+   "issue": null,
+   "title": "Leaderboard screen",
+   "url": null,
+   "milestone": "M3",
+   "milestoneName": "M3 Backend and leaderboards",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.1,
+   "due": "2026-09-25",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-054"
+   ],
+   "blockedBy": [
+    "MC-020",
+    "MC-034"
+   ]
+  },
+  {
+   "id": "MC-037",
+   "issue": null,
+   "title": "High score nearby screen",
+   "url": null,
+   "milestone": "M3",
+   "milestoneName": "M3 Backend and leaderboards",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.1,
+   "due": "2026-09-25",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [],
+   "blockedBy": [
+    "MC-020",
+    "MC-033"
+   ]
+  },
+  {
+   "id": "MC-040",
+   "issue": null,
+   "title": "Analytics facade and PostHog sink",
+   "url": null,
+   "milestone": "M4",
+   "milestoneName": "M4 Analytics, capture, rating",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.3,
+   "due": "2026-09-28",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-041",
+    "MC-042"
+   ],
+   "blockedBy": [
+    "MC-023"
+   ]
+  },
+  {
+   "id": "MC-041",
+   "issue": null,
+   "title": "Mixpanel sink",
+   "url": null,
+   "milestone": "M9",
+   "milestoneName": "M9 Extras (backlog)",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.25,
+   "due": null,
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [],
+   "blockedBy": [
+    "MC-040"
+   ]
+  },
+  {
+   "id": "MC-042",
+   "issue": null,
+   "title": "Instrument the event schema",
+   "url": null,
+   "milestone": "M4",
+   "milestoneName": "M4 Analytics, capture, rating",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.2,
+   "due": "2026-09-28",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-043"
+   ],
+   "blockedBy": [
+    "MC-011",
+    "MC-021",
+    "MC-040"
+   ]
+  },
+  {
+   "id": "MC-043",
+   "issue": null,
+   "title": "PostHog dashboards",
+   "url": null,
+   "milestone": "M4",
+   "milestoneName": "M4 Analytics, capture, rating",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.2,
+   "due": "2026-09-28",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [],
+   "blockedBy": [
+    "MC-042"
+   ]
+  },
+  {
+   "id": "MC-044",
+   "issue": null,
+   "title": "Session recorder port",
+   "url": null,
+   "milestone": "M4",
+   "milestoneName": "M4 Analytics, capture, rating",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.1,
+   "due": "2026-09-28",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-045",
+    "MC-051",
+    "MC-055",
+    "MC-072"
+   ],
+   "blockedBy": [
+    "MC-004",
+    "MC-023"
+   ]
+  },
+  {
+   "id": "MC-045",
+   "issue": null,
+   "title": "Upload through the existing pipeline",
+   "url": null,
+   "milestone": "M4",
+   "milestoneName": "M4 Analytics, capture, rating",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.1,
+   "due": "2026-09-28",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-047"
+   ],
+   "blockedBy": [
+    "MC-044"
+   ]
+  },
+  {
+   "id": "MC-046",
+   "issue": null,
+   "title": "Detection rating screen",
+   "url": null,
+   "milestone": "M4",
+   "milestoneName": "M4 Analytics, capture, rating",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.1,
+   "due": "2026-09-28",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-047"
+   ],
+   "blockedBy": [
+    "MC-020",
+    "MC-030"
+   ]
+  },
+  {
+   "id": "MC-047",
+   "issue": null,
+   "title": "ml ingestion of bundles and ratings",
+   "url": null,
+   "milestone": "M9",
+   "milestoneName": "M9 Extras (backlog)",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.5,
+   "due": null,
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-048"
+   ],
+   "blockedBy": [
+    "MC-045",
+    "MC-046"
+   ]
+  },
+  {
+   "id": "MC-048",
+   "issue": null,
+   "title": "Detector fine-tune on mined phone frames",
+   "url": null,
+   "milestone": "M9",
+   "milestoneName": "M9 Extras (backlog)",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 1.0,
+   "due": null,
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [],
+   "blockedBy": [
+    "MC-047"
+   ]
+  },
+  {
+   "id": "MC-050",
+   "issue": null,
+   "title": "Share card renderer",
+   "url": null,
+   "milestone": "M6",
+   "milestoneName": "M6 Share and polish",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.5,
+   "due": "2026-09-30",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-051",
+    "MC-052"
+   ],
+   "blockedBy": [
+    "MC-015"
+   ]
+  },
+  {
+   "id": "MC-051",
+   "issue": null,
+   "title": "Best-sit clip export",
+   "url": null,
+   "milestone": "M6",
+   "milestoneName": "M6 Share and polish",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 1.0,
+   "due": "2026-10-01",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [],
+   "blockedBy": [
+    "MC-044",
+    "MC-050"
+   ]
+  },
+  {
+   "id": "MC-052",
+   "issue": null,
+   "title": "Native share sheet and targets",
+   "url": null,
+   "milestone": "M6",
+   "milestoneName": "M6 Share and polish",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.5,
+   "due": "2026-10-01",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-062"
+   ],
+   "blockedBy": [
+    "MC-050"
+   ]
+  },
+  {
+   "id": "MC-053",
+   "issue": null,
+   "title": "Final dog art and animations",
+   "url": null,
+   "milestone": "M6",
+   "milestoneName": "M6 Share and polish",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 2.0,
+   "due": "2026-10-05",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [],
+   "blockedBy": []
+  },
+  {
+   "id": "MC-054",
+   "issue": null,
+   "title": "Polish pass",
+   "url": null,
+   "milestone": "M6",
+   "milestoneName": "M6 Share and polish",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.5,
+   "due": "2026-10-06",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [],
+   "blockedBy": [
+    "MC-013",
+    "MC-021",
+    "MC-036"
+   ]
+  },
+  {
+   "id": "MC-055",
+   "issue": null,
+   "title": "Performance and thermal test",
+   "url": null,
+   "milestone": "M6",
+   "milestoneName": "M6 Share and polish",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.5,
+   "due": "2026-10-06",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-062"
+   ],
+   "blockedBy": [
+    "MC-013",
+    "MC-044"
+   ]
+  },
+  {
+   "id": "MC-060",
+   "issue": null,
+   "title": "Store listings and compliance",
+   "url": null,
+   "milestone": "M7",
+   "milestoneName": "M7 Release",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.4,
+   "due": "2026-10-07",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-064"
+   ],
+   "blockedBy": [
+    "MC-002",
+    "MC-028",
+    "MC-073"
+   ]
+  },
+  {
+   "id": "MC-061",
+   "issue": null,
+   "title": "Crashlytics",
+   "url": null,
+   "milestone": "M7",
+   "milestoneName": "M7 Release",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.1,
+   "due": "2026-10-07",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [],
+   "blockedBy": [
+    "MC-025"
+   ]
+  },
+  {
+   "id": "MC-062",
+   "issue": null,
+   "title": "Beta with real dogs",
+   "url": null,
+   "milestone": "M7",
+   "milestoneName": "M7 Release",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.3,
+   "due": "2026-10-21",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-064"
+   ],
+   "blockedBy": [
+    "MC-052",
+    "MC-055",
+    "MC-072"
+   ]
+  },
+  {
+   "id": "MC-063",
+   "issue": null,
+   "title": "Remote Config and kill switch",
+   "url": null,
+   "milestone": "M7",
+   "milestoneName": "M7 Release",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.1,
+   "due": "2026-10-07",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-064"
+   ],
+   "blockedBy": [
+    "MC-025"
+   ]
+  },
+  {
+   "id": "MC-064",
+   "issue": null,
+   "title": "Submission",
+   "url": null,
+   "milestone": "M7",
+   "milestoneName": "M7 Release",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.1,
+   "due": "2026-10-22",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [],
+   "blockedBy": [
+    "MC-060",
+    "MC-062",
+    "MC-063"
+   ]
+  },
+  {
+   "id": "MC-070",
+   "issue": null,
+   "title": "ARCore session, renderer features and camera preview",
+   "url": null,
+   "milestone": "M5",
+   "milestoneName": "M5 Android",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.3,
+   "due": "2026-09-29",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-071",
+    "MC-073"
+   ],
+   "blockedBy": [
+    "MC-003"
+   ]
+  },
+  {
+   "id": "MC-071",
+   "issue": null,
+   "title": "Detector on Android",
+   "url": null,
+   "milestone": "M5",
+   "milestoneName": "M5 Android",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.2,
+   "due": "2026-09-29",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-072"
+   ],
+   "blockedBy": [
+    "MC-005",
+    "MC-070"
+   ]
+  },
+  {
+   "id": "MC-072",
+   "issue": null,
+   "title": "Android capture, upload, share and device check",
+   "url": null,
+   "milestone": "M5",
+   "milestoneName": "M5 Android",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.3,
+   "due": "2026-09-29",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-062"
+   ],
+   "blockedBy": [
+    "MC-044",
+    "MC-071"
+   ]
+  },
+  {
+   "id": "MC-073",
+   "issue": null,
+   "title": "Signed Play build and listing",
+   "url": null,
+   "milestone": "M5",
+   "milestoneName": "M5 Android",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.2,
+   "due": "2026-09-29",
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-060"
+   ],
+   "blockedBy": [
+    "MC-025",
+    "MC-070"
+   ]
+  },
+  {
+   "id": "MC-080",
+   "issue": null,
+   "title": "Entitlements and monetization slots",
+   "url": null,
+   "milestone": "M8",
+   "milestoneName": "M8 Monetization (backlog)",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 1.5,
+   "due": null,
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [
+    "MC-081",
+    "MC-082"
+   ],
+   "blockedBy": []
+  },
+  {
+   "id": "MC-081",
+   "issue": null,
+   "title": "Unity IAP: dog skins and Pro",
+   "url": null,
+   "milestone": "M8",
+   "milestoneName": "M8 Monetization (backlog)",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 2.0,
+   "due": null,
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [],
+   "blockedBy": [
+    "MC-080"
+   ]
+  },
+  {
+   "id": "MC-082",
+   "issue": null,
+   "title": "Rewarded ads for one continue",
+   "url": null,
+   "milestone": "M8",
+   "milestoneName": "M8 Monetization (backlog)",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 1.5,
+   "due": null,
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [],
+   "blockedBy": [
+    "MC-080"
+   ]
+  },
+  {
+   "id": "MC-090",
+   "issue": null,
+   "title": "Custom \"where people play\" map",
+   "url": null,
+   "milestone": "M9",
+   "milestoneName": "M9 Extras (backlog)",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 1.0,
+   "due": null,
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [],
+   "blockedBy": []
+  },
+  {
+   "id": "MC-091",
+   "issue": null,
+   "title": "Spanish localisation",
+   "url": null,
+   "milestone": "M9",
+   "milestoneName": "M9 Extras (backlog)",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 1.0,
+   "due": null,
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [],
+   "blockedBy": []
+  },
+  {
+   "id": "MC-092",
+   "issue": null,
+   "title": "Multiple dog profiles",
+   "url": null,
+   "milestone": "M9",
+   "milestoneName": "M9 Extras (backlog)",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.5,
+   "due": null,
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [],
+   "blockedBy": []
+  },
+  {
+   "id": "MC-093",
+   "issue": null,
+   "title": "Spike: handler 360\u00b0 turn mechanic",
+   "url": null,
+   "milestone": "M9",
+   "milestoneName": "M9 Extras (backlog)",
+   "status": "backlog",
+   "statusName": "Backlog",
+   "effort": 0.3,
+   "due": null,
+   "startedAt": null,
+   "completedAt": null,
+   "canceledAt": null,
+   "blocks": [],
+   "blockedBy": [
+    "MC-007"
+   ]
+  }
+ ]
+}
