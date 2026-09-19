@@ -183,12 +183,23 @@ function fmtDays(x) { return `${x.toFixed(1)} d`; }
 function hash(i, f) { let h = (i * 2654435761 + f * 40503) >>> 0; h ^= h >>> 13; h = (h * 0x5bd1e995) >>> 0; return (h >>> 8) / 16777216; }
 
 // ── Loading ──────────────────────────────────────────────────────────────
+async function gunzip(buf) {
+  const bytes = new Uint8Array(buf);
+  if (!(bytes[0] === 0x1f && bytes[1] === 0x8b)) return buf;  // already inflated by the browser
+  if (typeof DecompressionStream === "function") {
+    return new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer();
+  }
+  await new Promise((res, rej) => { const sc = document.createElement("script"); sc.src = "https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako_inflate.min.js"; sc.onload = res; sc.onerror = () => rej(new Error("pako failed to load")); document.head.appendChild(sc); });
+  return window.pako.ungzip(bytes).buffer;
+}
 async function loadFrames() {
   const resp = await fetch("data/frames.bin.gz");
-  const blob = await resp.blob();
-  const buf = await new Response(blob.stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer();
+  if (!resp.ok) throw new Error("frames " + resp.status);
+  const buf = await gunzip(await resp.arrayBuffer());
   const view = new DataView(buf);
-  ROWS = view.getUint16(0, true); COLS = view.getUint16(2, true);
+  const rows = view.getUint16(0, true), cols = view.getUint16(2, true);
+  if (ROWS && (rows !== ROWS || cols !== COLS)) throw new Error("frame grid mismatch");
+  ROWS = rows; COLS = cols;
   const numUnique = view.getUint16(4, true); NUM_FRAMES = view.getUint16(6, true);
   const tableStart = 8 + 11;
   const offsets = [];
@@ -314,6 +325,17 @@ const figCanvas = document.getElementById("figCanvas");
 const figCtx = figCanvas.getContext("2d");
 function pingpong(f) { const cycle = (NUM_FRAMES - 1) * 2, p = f % cycle; return p < NUM_FRAMES ? p : cycle - p; }
 
+const STATE_FILL = { done: "#dd0000", started: "#ffd23f", blocked: "#0b0b14", todo: "#1c2233" };
+function drawStatic() {
+  figCtx.clearRect(0, 0, figCanvas.width, figCanvas.height);
+  for (let k = 0; k < bodyCells.length; k++) {
+    const { r, c } = bodyCells[k], t = cellTask[k];
+    figCtx.fillStyle = t ? STATE_FILL[t.state] : "#101018";
+    figCtx.fillRect(c * CELL + 2, r * CELL + 2, CELL - 4, CELL - 4);
+  }
+  sctx.clearRect(0, 0, strip.width, strip.height);
+  for (const h of stripHits) { figCtx.fillStyle = STATE_FILL[h.t.state]; sctx.fillStyle = STATE_FILL[h.t.state]; sctx.fillRect(h.x + 1, h.y + 1, h.w - 2, h.h - 2); sctx.fillStyle = "#6f6f6f"; sctx.font = "10px JetBrains Mono, monospace"; sctx.fillText(h.t.id.slice(3), h.x + 1, h.y + S.cell + 3); }
+}
 function drawFigure(f) {
   const fi = pingpong(f);
   const ringFrame = modelFrames[MODEL_TRUE][fi];
@@ -586,12 +608,20 @@ function showCallout(m, ev) {
 callout.querySelector(".x").addEventListener("click", () => callout.style.display = "none");
 document.addEventListener("click", ev => { if (!callout.contains(ev.target)) callout.style.display = "none"; });
 
+// ── Errors on the page, so a phone can report them ───────────────────────
+function showError(msg) {
+  const u = document.getElementById("cUpdated"); u.className = "v stale"; u.textContent = "ERROR · " + msg;
+  document.getElementById("fNote").textContent = "ERROR · " + msg;
+}
+window.addEventListener("error", e => showError(e.message || String(e)));
+window.addEventListener("unhandledrejection", e => showError((e.reason && e.reason.message) || String(e.reason)));
+
 // ── Main ─────────────────────────────────────────────────────────────────
 async function refreshProgress(force) {
   try {
     const p = await loadJSON("data/progress.json?t=" + Date.now());
     if (!force && progress && p.generatedAt === progress.generatedAt) return;
-    progress = p; buildModel(); layoutStrip(); buildOverlay(); renderCartouche();
+    progress = p; buildModel(); layoutStrip(); buildOverlay(); renderCartouche(); if (!modelFrames) drawStatic();
   } catch (e) { console.error(e); document.getElementById("cUpdated").innerHTML = `<span class="stale">NO DATA · ${e.message}</span>`; }
 }
 function tick(now) {
@@ -599,14 +629,23 @@ function tick(now) {
   requestAnimationFrame(tick);
 }
 (async () => {
-  [sheetDay, sheetNight, body] = await Promise.all([loadImage("glyphs.png"), loadImage("glyphs_night.png"), loadJSON("data/body.json"), loadFrames()]);
-  figCanvas.width = COLS * CELL; figCanvas.height = ROWS * CELL;
-  buildBody();
-  await refreshProgress(true);
-  requestAnimationFrame(tick);
+  try {
+    [sheetDay, sheetNight, body] = await Promise.all([loadImage("glyphs.png"), loadImage("glyphs_night.png"), loadJSON("data/body.json")]);
+    ROWS = body.rows; COLS = body.cols;
+    figCanvas.width = COLS * CELL; figCanvas.height = ROWS * CELL;
+    buildBody();
+    await refreshProgress(true);
+  } catch (e) { showError(e.message); return; }
   setInterval(() => refreshProgress(false), REFRESH_MS);
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") refreshProgress(false); });
   let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { if (M) buildOverlay(); }, 150); });
+  try {
+    await loadFrames();
+    requestAnimationFrame(tick);
+  } catch (e) {
+    console.error(e); drawStatic();
+    document.getElementById("fNote").textContent = "STATIC RENDER · FRAMES UNAVAILABLE · " + e.message;
+  }
 })();
 </script>
 </body>
