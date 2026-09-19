@@ -133,7 +133,7 @@ for r in range(rows):
             prev.paste((80, 80, 80), (c * 4, r * 4, c * 4 + 4, r * 4 + 4))
 prev.save("/private/tmp/claude-501/-Users-francisco-dev-barknito-unity-game/9e4f56dc-5e64-46be-9891-c18c1ed0fca5/scratchpad/body_mask.png")
 
-# Night sheet: brightness 0.35, saturation 0.4, hue rotated 200 degrees.
+# Night sheet: brightness 0.48, saturation 0.4, hue rotated 200 degrees.
 night = arr.copy()
 rgb = night[..., :3] / 255.0
 out = np.zeros_like(rgb)
@@ -142,7 +142,7 @@ for y in range(rgb.shape[0]):
         h, s, v = colorsys.rgb_to_hsv(*rgb[y, x])
         if v > 0:
             h = (h + 200 / 360.0) % 1.0
-            out[y, x] = colorsys.hsv_to_rgb(h, min(1.0, s * 0.4), v * 0.35)
+            out[y, x] = colorsys.hsv_to_rgb(h, min(1.0, s * 0.4), v * 0.48)
 night[..., :3] = out * 255
 Image.fromarray(night.astype(np.uint8), "RGBA").save("site/glyphs_night.png")
 print("wrote site/glyphs_night.png")
