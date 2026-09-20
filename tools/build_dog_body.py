@@ -17,10 +17,12 @@ im = Image.open(src).convert("L")
 a = np.asarray(im) > 128
 ys, xs = np.nonzero(a)
 crop = a[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
-lab, n = ndimage.label(crop)
-sizes = ndimage.sum(crop, lab, range(1, n + 1))
+# Opening drops thin strokes (a horizon line touching the legs) out of the body.
+opened = ndimage.binary_opening(crop, iterations=int(crop.shape[1] * 0.012))
+lab, n = ndimage.label(opened)
+sizes = ndimage.sum(opened, lab, range(1, n + 1))
 body_px = lab == (int(np.argmax(sizes)) + 1)
-accent_px = crop & ~body_px
+accent_px = crop & ~ndimage.binary_dilation(body_px, iterations=2)
 
 scale = width_cells * CELL / crop.shape[1]
 W, H = int(crop.shape[1] * scale), int(crop.shape[0] * scale)

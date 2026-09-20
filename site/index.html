@@ -39,7 +39,11 @@
   .stale { color: var(--red); }
 
   /* Strip */
-  section h2 { font-size: 10px; letter-spacing: .18em; color: var(--dim); margin: 0 0 6px; font-weight: 400; }
+  section h2 { font-size: 10px; letter-spacing: .18em; color: var(--dim); margin: 0 0 6px; font-weight: 400; display: flex; gap: 18px; flex-wrap: wrap; align-items: center; }
+  .sel { display: inline-flex; gap: 4px; }
+  .sel span { cursor: pointer; padding: 2px 8px; border: 1px solid var(--faint); color: var(--dim); }
+  .sel span:hover { color: var(--ink); border-color: var(--dim); }
+  .sel span.on { color: var(--today); border-color: var(--today); }
   .strip-wrap { overflow-x: auto; border-top: 1px solid var(--faint); border-bottom: 1px solid var(--faint); padding: 8px 0; margin-bottom: 26px; }
   #stripCanvas { cursor: crosshair; }
 
@@ -112,7 +116,7 @@
 </section>
 
 <section>
-  <h2>THE FRONT</h2>
+  <h2>THE FRONT <span class="sel" id="figSel"><span data-f="human">HUMAN</span><span data-f="dog">DOG</span><span data-f="dog_ground">DOG + GROUND</span></span></h2>
   <div class="figure-wrap" id="figWrap">
     <canvas id="figCanvas"></canvas>
     <svg id="figSvg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
@@ -654,6 +658,24 @@ function showError(msg) {
 window.addEventListener("error", e => showError(e.message || String(e)));
 window.addEventListener("unhandledrejection", e => showError((e.reason && e.reason.message) || String(e.reason)));
 
+// ── Figure selection ─────────────────────────────────────────────────────
+const FIGURES = ["human", "dog", "dog_ground"];
+function currentFigure() {
+  const q = params.get("figure"); if (FIGURES.includes(q)) return q;
+  try { const s = localStorage.getItem("figure"); if (FIGURES.includes(s)) return s; } catch (e) {}
+  return "dog_ground";
+}
+async function loadFigure(name) {
+  body = await loadJSON(`data/body_${name}.json`);
+  ROWS = body.rows; COLS = body.cols;
+  figCanvas.width = COLS * CELL; figCanvas.height = ROWS * CELL;
+  buildBody();
+  try { localStorage.setItem("figure", name); } catch (e) {}
+  document.querySelectorAll("#figSel span").forEach(el => el.classList.toggle("on", el.dataset.f === name));
+  if (progress) { buildModel(); layoutStrip(); buildOverlay(); renderCartouche(); if (!modelFrames) drawStatic(); }
+}
+document.querySelectorAll("#figSel span").forEach(el => el.addEventListener("click", () => loadFigure(el.dataset.f)));
+
 // ── Main ─────────────────────────────────────────────────────────────────
 async function refreshProgress(force) {
   try {
@@ -668,10 +690,8 @@ function tick(now) {
 }
 (async () => {
   try {
-    [sheetDay, sheetNight, body] = await Promise.all([loadImage("glyphs.png"), loadImage("glyphs_night.png"), loadJSON("data/body.json")]);
-    ROWS = body.rows; COLS = body.cols;
-    figCanvas.width = COLS * CELL; figCanvas.height = ROWS * CELL;
-    buildBody();
+    [sheetDay, sheetNight] = await Promise.all([loadImage("glyphs.png"), loadImage("glyphs_night.png")]);
+    await loadFigure(currentFigure());
     await refreshProgress(true);
   } catch (e) { showError(e.message); return; }
   setInterval(() => refreshProgress(false), REFRESH_MS);
