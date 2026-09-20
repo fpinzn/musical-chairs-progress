@@ -85,8 +85,16 @@ def beagle_standing(s=8, crown=True):
 POSES = {"sitting": beagle_sitting, "standing": beagle_standing}
 
 
+def image_mask(path):
+    """A silhouette from any RGBA or greyscale image: alpha where present, else luminance."""
+    src = Image.open(path)
+    if "A" in src.getbands():
+        return src.split()[-1]
+    return src.convert("L")
+
+
 def cell_mask(pose, width_cells=48, y_center=0.52, crown=True):
-    im = POSES[pose](crown=crown)
+    im = POSES[pose](crown=crown) if pose in POSES else image_mask(pose)
     bbox = im.getbbox()
     im = im.crop(bbox)
     scale = (width_cells * CELL) / im.width
