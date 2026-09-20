@@ -333,8 +333,10 @@ function drawStatic() {
     figCtx.fillStyle = t ? STATE_FILL[t.state] : "#101018";
     figCtx.fillRect(c * CELL + 2, r * CELL + 2, CELL - 4, CELL - 4);
   }
-  sctx.clearRect(0, 0, strip.width, strip.height);
-  for (const h of stripHits) { figCtx.fillStyle = STATE_FILL[h.t.state]; sctx.fillStyle = STATE_FILL[h.t.state]; sctx.fillRect(h.x + 1, h.y + 1, h.w - 2, h.h - 2); sctx.fillStyle = "#6f6f6f"; sctx.font = "10px JetBrains Mono, monospace"; sctx.fillText(h.t.id.slice(3), h.x + 1, h.y + S.cell + 3); }
+  if (!stripLayout) return;
+  sctx.setTransform(stripLayout.dpr, 0, 0, stripLayout.dpr, 0, 0);
+  sctx.clearRect(0, 0, stripLayout.w, stripLayout.h);
+  for (const h of stripHits) { sctx.fillStyle = STATE_FILL[h.t.state]; sctx.fillRect(h.x + 1, h.y + 1, h.w - 2, h.h - 2); }
 }
 function drawFigure(f) {
   const fi = pingpong(f);
@@ -464,83 +466,110 @@ function relax(items) {
 }
 
 // ── Strip rendering ──────────────────────────────────────────────────────
+// Wide screens: label column on the left, one line of cells per milestone.
+// Narrow screens: the title on its own line, cells wrapped underneath like terminal text.
 const strip = document.getElementById("stripCanvas");
 const sctx = strip.getContext("2d");
-const S = { label: 236, rowH: 54, top: 22, cell: CELL, padL: 8 };
-let stripHits = [];
+const S = { cell: CELL, lineH: 44, padL: 8, labelCol: 236, headH: 30, gap: 10 };
+let stripHits = [], stripLayout = null;
 
 function layoutStrip() {
+  const avail = Math.max(300, strip.parentElement.clientWidth);
   const rows = M.milestones.filter(m => m.tasks.length);
   const maxCells = Math.max(...rows.map(m => m.tasks.reduce((s, t) => s + Math.max(1, Math.round((t.effort || 0) * 10)), 0)));
-  strip.width = S.label + maxCells * S.cell + 40;
-  strip.height = S.top + rows.length * S.rowH + 6;
-  strip.style.width = strip.width + "px"; strip.style.height = strip.height + "px";
+  const wide = avail >= S.labelCol + maxCells * S.cell + 40;
+  const x0 = wide ? S.labelCol : S.padL;
+  const perLine = wide ? Infinity : Math.max(6, Math.floor((avail - x0 - S.padL) / S.cell));
+  const lineH = wide ? 56 : S.lineH;
   stripHits = [];
-  rows.forEach((m, ri) => {
-    const y = S.top + ri * S.rowH;
-    let x = S.label;
+  let y = 22;
+  rows.forEach(m => {
     const ts = [...m.tasks].sort((a, b) => (a.due || "9").localeCompare(b.due || "9") || a.level - b.level || a.id.localeCompare(b.id));
+    const rowTop = y;
+    if (!wide) y += S.headH;
+    let col = 0, lineY = y, lines = 1;
     for (const t of ts) {
       const n = Math.max(1, Math.round((t.effort || 0) * 10));
-      t.strip = { x, y, n, cells: [] };
+      t.strip = { n, cells: [] };
       for (let j = 0; j < n; j++) {
+        if (col >= perLine) { col = 0; lineY += lineH; lines++; }
         const k = t.cells && t.cells.length ? t.cells[Math.floor((j + 0.5) / n * t.cells.length)] : null;
-        t.strip.cells.push(k);
+        const cx = x0 + col * S.cell;
+        t.strip.cells.push({ x: cx, y: lineY, k });
+        stripHits.push({ x: cx, y: lineY, w: S.cell, h: S.cell, t });
+        col++;
       }
-      stripHits.push({ x, y, w: n * S.cell, h: S.cell, t });
-      x += n * S.cell;
     }
-    m.stripRow = { y, x0: S.label, x1: x, tasks: ts };
+    m.stripRow = { top: rowTop, y, tasks: ts, wide };
+    y = lineY + lineH + (wide ? 0 : S.gap);
   });
+  const w = wide ? Math.max(avail, x0 + maxCells * S.cell + 40) : avail;
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  strip.width = Math.round(w * dpr); strip.height = Math.round((y + 4) * dpr);
+  strip.style.width = w + "px"; strip.style.height = (y + 4) + "px";
+  stripLayout = { wide, dpr, w, h: y + 4, x0 };
+}
+
+function blitCell(ctx, look, g, x, y) {
+  ctx.globalAlpha = look.alpha;
+  ctx.drawImage(look.sheet, (g % SHEET_COLS) * CELL, Math.floor(g / SHEET_COLS) * CELL, CELL, CELL, x, y, S.cell, S.cell);
+  ctx.globalAlpha = 1;
 }
 
 function drawStrip(f) {
+  if (!stripLayout) return;
+  const { wide, dpr, w, h, x0 } = stripLayout;
   const fi = pingpong(f);
   const frames = [modelFrames[MODEL_NOISE][fi], modelFrames[MODEL_AUTOMATA][fi], modelFrames[MODEL_TRUE][fi]];
-  sctx.clearRect(0, 0, strip.width, strip.height);
-  sctx.font = "10px JetBrains Mono, monospace"; sctx.textBaseline = "top";
-  // Column header ticks every day.
-  sctx.fillStyle = "#6f6f6f";
-  for (let d = 0; d * 10 * S.cell + S.label < strip.width - 40; d++) { const x = S.label + d * 10 * S.cell; sctx.fillRect(x, S.top - 8, 1, 6); if (d % 1 === 0) sctx.fillText(`${d}d`, x + 3, S.top - 20); }
+  sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  sctx.clearRect(0, 0, w, h);
+  sctx.textBaseline = "top";
+  if (wide) {
+    sctx.fillStyle = "#6f6f6f"; sctx.font = "10px JetBrains Mono, monospace";
+    for (let d = 0; x0 + d * 10 * S.cell < w - 40; d++) { const x = x0 + d * 10 * S.cell; sctx.fillRect(x, 14, 1, 6); sctx.fillText(`${d}d`, x + 3, 2); }
+  }
   for (const m of M.milestones) {
     if (!m.stripRow) continue;
-    const { y, tasks } = m.stripRow;
+    const { top, tasks } = m.stripRow;
     sctx.fillStyle = m.core ? "#e8e8e8" : "#6f6f6f"; sctx.font = "bold 10px JetBrains Mono, monospace";
-    sctx.fillText(`${m.id} ${m.name}`.slice(0, 34), S.padL, y + 2);
-    sctx.font = "10px JetBrains Mono, monospace"; sctx.fillStyle = "#6f6f6f";
-    sctx.fillText(`${fmtDays(m.effort)} · ${m.done}/${m.tasks.length}`, S.padL, y + 15);
-    let lastLabelEnd = -1e9, lastDue = null, lastDateEnd = -1e9;
+    const title = `${m.id} ${m.name}`, stats = `${fmtDays(m.effort)} · ${m.done}/${m.tasks.length}`;
+    if (wide) { sctx.fillText(title.slice(0, 34), S.padL, top + 2); sctx.font = "10px JetBrains Mono, monospace"; sctx.fillStyle = "#6f6f6f"; sctx.fillText(stats, S.padL, top + 15); }
+    else { sctx.fillText(title, S.padL, top + 2); sctx.font = "10px JetBrains Mono, monospace"; sctx.fillStyle = "#6f6f6f"; sctx.fillText(stats, S.padL + 6.2 * title.length + 10, top + 2); }
+    let lastLabel = { y: -1, x: -1e9 }, lastDue = null, lastDate = { y: -1, x: -1e9 };
     for (const t of tasks) {
-      const { x, n, cells } = t.strip;
-      for (let j = 0; j < n; j++) {
-        const k = cells[j];
+      const cells = t.strip.cells, first = cells[0], last = cells[cells.length - 1];
+      cells.forEach(({ x, y, k }, j) => {
         let look, g;
         if (k == null) { look = { model: MODEL_NOISE, sheet: sheetNight, alpha: 0.5 }; g = frames[MODEL_NOISE][(j * 37 + t.id.charCodeAt(4) * 11) % (ROWS * COLS)]; }
         else { look = cellLook(k, f); const { r, c } = bodyCells[k]; g = frames[look.model][r * COLS + c]; }
-        sctx.globalAlpha = look.alpha;
-        sctx.drawImage(look.sheet, (g % SHEET_COLS) * CELL, Math.floor(g / SHEET_COLS) * CELL, CELL, CELL, x + j * S.cell, y, S.cell, S.cell);
-        sctx.globalAlpha = 1;
-        if (t.pocket || t.salient) { sctx.strokeStyle = t.pocket ? "#dd0000" : "#8fd3ff"; sctx.lineWidth = 1; sctx.beginPath(); sctx.moveTo(x + j * S.cell, y + S.cell); sctx.lineTo(x + j * S.cell + S.cell, y); sctx.stroke(); }
-      }
-      if (t.pocket || t.salient) { sctx.strokeStyle = t.pocket ? "#dd0000" : "#8fd3ff"; sctx.strokeRect(x + 0.5, y + 0.5, n * S.cell - 1, S.cell - 1); }
-      if (hoverTask === t) { sctx.strokeStyle = "#ffd23f"; sctx.lineWidth = 2; sctx.strokeRect(x + 1, y + 1, n * S.cell - 2, S.cell - 2); sctx.lineWidth = 1; }
-      // Id under the run, skipped on collision.
-      if (x >= lastLabelEnd) { sctx.fillStyle = t.critical ? "#8fd3ff" : "#6f6f6f"; sctx.fillText(t.id.slice(3), x + 1, y + S.cell + 3); lastLabelEnd = x + 26; }
+        blitCell(sctx, look, g, x, y);
+        if (t.pocket || t.salient) {
+          sctx.strokeStyle = t.pocket ? "#dd0000" : "#8fd3ff"; sctx.lineWidth = 1;
+          sctx.beginPath(); sctx.moveTo(x, y + S.cell); sctx.lineTo(x + S.cell, y); sctx.stroke();
+          sctx.strokeRect(x + 0.5, y + 0.5, S.cell - 1, S.cell - 1);
+        }
+        if (hoverTask === t) { sctx.strokeStyle = "#ffd23f"; sctx.lineWidth = 2; sctx.strokeRect(x + 1, y + 1, S.cell - 2, S.cell - 2); sctx.lineWidth = 1; }
+      });
+      // Id under the first cell of the run, skipped on collision.
+      if (first.y !== lastLabel.y || first.x >= lastLabel.x) { sctx.fillStyle = t.critical ? "#8fd3ff" : "#6f6f6f"; sctx.fillText(t.id.slice(3), first.x + 1, first.y + S.cell + 3); lastLabel = { y: first.y, x: first.x + 26 }; }
       // Date tick where the due date changes.
       if (t.due && t.due !== lastDue) {
-        sctx.fillStyle = "#8fd3ff"; sctx.fillRect(x, y - 5, 1, 5);
-        if (x >= lastDateEnd) { sctx.fillText(fmt(t.dueDate), x + 3, y - 15); lastDateEnd = x + 44; }
+        sctx.fillStyle = "#8fd3ff"; sctx.fillRect(first.x, first.y - 5, 1, 5);
+        if (first.y !== lastDate.y || first.x >= lastDate.x) { sctx.fillText(fmt(t.dueDate), first.x + 3, first.y - 15); lastDate = { y: first.y, x: first.x + 44 }; }
         lastDue = t.due;
       }
+      void last;
     }
-    // Planned position today within this row, and the done boundary.
+    // Planned position today and the done boundary, at cell granularity.
     if (m.core) {
-      const doneW = tasks.filter(t => t.state === "done").reduce((s, t) => s + t.strip.n, 0) * S.cell;
-      const plannedW = (() => { let w = 0; for (const t of tasks) { if (t.dueDate <= TODAY) w += t.strip.n; } return w * S.cell; })();
-      const px = S.label + plannedW;
-      sctx.fillStyle = "#ffd23f"; sctx.beginPath(); sctx.moveTo(px - 4, y - 6); sctx.lineTo(px + 4, y - 6); sctx.lineTo(px, y - 1); sctx.fill();
-      sctx.fillRect(px, y, 1, S.cell);
-      if (doneW > 0) { sctx.fillStyle = "#fff"; sctx.fillRect(S.label + doneW - 1, y - 2, 2, S.cell + 4); }
+      const flat = tasks.flatMap(t => t.strip.cells.map(c => ({ ...c, t })));
+      const nPlanned = tasks.filter(t => t.dueDate <= TODAY).reduce((s, t) => s + t.strip.n, 0);
+      const nDone = tasks.filter(t => t.state === "done").reduce((s, t) => s + t.strip.n, 0);
+      const at = n => n >= flat.length ? { x: flat[flat.length - 1].x + S.cell, y: flat[flat.length - 1].y } : flat[n];
+      const p = at(nPlanned);
+      sctx.fillStyle = "#ffd23f"; sctx.beginPath(); sctx.moveTo(p.x - 4, p.y - 6); sctx.lineTo(p.x + 4, p.y - 6); sctx.lineTo(p.x, p.y - 1); sctx.fill();
+      sctx.fillRect(p.x, p.y, 1, S.cell);
+      if (nDone > 0) { const d = at(nDone); sctx.fillStyle = "#fff"; sctx.fillRect(d.x - 1, d.y - 2, 2, S.cell + 4); }
     }
   }
 }
@@ -638,7 +667,7 @@ function tick(now) {
   } catch (e) { showError(e.message); return; }
   setInterval(() => refreshProgress(false), REFRESH_MS);
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") refreshProgress(false); });
-  let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { if (M) buildOverlay(); }, 150); });
+  let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { if (M) { layoutStrip(); buildOverlay(); if (!modelFrames) drawStatic(); } }, 150); });
   try {
     await loadFrames();
     requestAnimationFrame(tick);
