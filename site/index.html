@@ -116,7 +116,10 @@
 </section>
 
 <section>
-  <h2>THE FRONT <span class="sel" id="figSel"><span data-f="human">HUMAN</span><span data-f="dog">DOG</span><span data-f="dog_ground">DOG + GROUND</span></span></h2>
+  <h2>THE FRONT
+    <span class="sel" id="figSel"><span data-f="lab_front">LAB FRONT</span><span data-f="lab_back">LAB BACK</span><span data-f="dog">BARK DOG</span><span data-f="dog_ground">BARK + GROUND</span><span data-f="human">HUMAN</span></span>
+    <span class="sel" id="styleSel"><span data-s="typed">TYPED</span><span data-s="circles">CIRCLES</span><span data-s="source">ASCII MAN</span></span>
+  </h2>
   <div class="figure-wrap" id="figWrap">
     <canvas id="figCanvas"></canvas>
     <svg id="figSvg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
@@ -168,6 +171,8 @@ const SIM = params.get("sim") ? parseFloat(params.get("sim")) : null;
 // ── State ────────────────────────────────────────────────────────────────
 let ROWS, COLS, NUM_FRAMES, modelFrames;
 let sheetDay, sheetNight;
+let ALPHA = null;              // {typed:{sheets,meta}, circles:{...}, ivory, palette}
+let glyphStyle = "typed";      // typed | circles | source
 let body;            // {runs}
 let bodyCells = [];  // [{r,c}] bottom-up scanline order
 let cellOrder;       // Int32Array ROWS*COLS -> index in bodyCells or -1
@@ -225,6 +230,60 @@ async function loadFrames() {
   }
 }
 function loadImage(src) { return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; }); }
+
+// ── Tintable glyph alphabets ─────────────────────────────────────────────
+function tintSheet(img, rgb) {
+  const cv = document.createElement("canvas");
+  cv.width = img.width; cv.height = img.height;
+  const cx = cv.getContext("2d");
+  cx.drawImage(img, 0, 0);
+  cx.globalCompositeOperation = "source-in";
+  cx.fillStyle = `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
+  cx.fillRect(0, 0, cv.width, cv.height);
+  return cv;
+}
+async function loadAlphabets() {
+  const meta = await loadJSON("data/alphabets.json");
+  const [typedImg, circleImg] = await Promise.all([loadImage("glyphs_typed.png"), loadImage("glyphs_circles.png")]);
+  const colours = [meta.ivory, ...meta.palette];
+  ALPHA = {
+    sheetCols: meta.sheetCols, colours,
+    typed: { meta: meta.typed, sheets: colours.map(c => tintSheet(typedImg, c)), sheetCols: meta.sheetCols, colours },
+    circles: { meta: meta.circles, sheets: colours.map(c => tintSheet(circleImg, c)), sheetCols: meta.sheetCols, colours },
+  };
+}
+// A task's colour index: 0 is ivory, 1.. are the palette hues.
+function hueIndex(t) {
+  if (t.hueIdx == null) {
+    let h = 0; for (const ch of t.id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    t.hueIdx = 1 + (h % (ALPHA.colours.length - 1));
+  }
+  return t.hueIdx;
+}
+const FLICKER = { done: 30, started: 2, todo: 9, blocked: 45 };
+function glyphOf(pool, k, f, rate) {
+  return pool[Math.floor(hash(k, Math.floor(f / rate)) * pool.length) % pool.length];
+}
+// What to blit for body cell k: a tinted sheet, its source rect, and an alpha.
+function glyphTile(k, f) {
+  const A = ALPHA[glyphStyle], t = cellTask[k];
+  const st = t ? t.state : "todo";
+  const g = glyphOf(A.meta.pools[st], k, f, FLICKER[st]);
+  let colour, alpha;
+  if (!t) { colour = 0; alpha = 0.35; }
+  else if (st === "done") { colour = hueIndex(t); alpha = 1; }
+  else if (st === "started") { colour = hash(k, Math.floor(f / 2)) < 0.5 ? hueIndex(t) : 0; alpha = 1; }
+  else if (st === "todo") { colour = hueIndex(t); alpha = 0.55; }
+  else { colour = 0; alpha = 0.3; }
+  return { sheet: A.sheets[colour], sx: (g % A.sheetCols) * CELL, sy: Math.floor(g / A.sheetCols) * CELL, alpha };
+}
+function ringTile(k, dir, f) {
+  const A = ALPHA[glyphStyle];
+  const pool = hash(k, 3) < 0.08 ? A.meta.ring.dot : A.meta.ring[String(dir)];
+  const g = pool[Math.floor(hash(k, 7) * pool.length) % pool.length];
+  const colour = hash(k, 11) < 0.22 ? 1 + Math.floor(hash(k, 13) * (A.colours.length - 1)) : 0;
+  return { sheet: A.sheets[colour], sx: (g % A.sheetCols) * CELL, sy: Math.floor(g / A.sheetCols) * CELL, alpha: 0.6 };
+}
 async function loadJSON(url) { const r = await fetch(url, { cache: "no-store" }); if (!r.ok) throw new Error(url + " " + r.status); return r.json(); }
 
 let cellExtra;  // 0 none, 1 blank (skip), 2 accent (always lit)
@@ -349,10 +408,40 @@ function drawStatic() {
   for (const h of stripHits) { sctx.fillStyle = STATE_FILL[h.t.state]; sctx.fillRect(h.x + 1, h.y + 1, h.w - 2, h.h - 2); }
 }
 function drawFigure(f) {
-  const fi = pingpong(f);
-  const ringFrame = modelFrames[MODEL_TRUE][fi];
-  const frames = [modelFrames[MODEL_NOISE][fi], modelFrames[MODEL_AUTOMATA][fi], ringFrame];
   figCtx.clearRect(0, 0, figCanvas.width, figCanvas.height);
+  if (glyphStyle === "source") drawFigureSource(f); else drawFigureGlyph(f);
+  if (hoverTask && hoverTask.cells) {
+    figCtx.strokeStyle = "#ffd23f"; figCtx.lineWidth = 2;
+    for (const k of hoverTask.cells) { const { r, c } = bodyCells[k]; figCtx.strokeRect(c * CELL + 1, r * CELL + 1, CELL - 2, CELL - 2); }
+  }
+}
+function drawFigureGlyph(f) {
+  const rings = body.rings || [];
+  for (let i = 0; i < rings.length; i += 3) {
+    const r = rings[i], c = rings[i + 1];
+    const tl = ringTile(r * COLS + c, rings[i + 2], f);
+    figCtx.globalAlpha = tl.alpha;
+    figCtx.drawImage(tl.sheet, tl.sx, tl.sy, CELL, CELL, c * CELL, r * CELL, CELL, CELL);
+  }
+  for (let k = 0; k < bodyCells.length; k++) {
+    const { r, c } = bodyCells[k], tl = glyphTile(k, f);
+    figCtx.globalAlpha = tl.alpha;
+    figCtx.drawImage(tl.sheet, tl.sx, tl.sy, CELL, CELL, c * CELL, r * CELL, CELL, CELL);
+  }
+  const A = ALPHA[glyphStyle];
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+    if (cellExtra[r * COLS + c] !== 2) continue;
+    const k = r * COLS + c;
+    const g = glyphOf(A.meta.pools.done, k, f, 30);
+    figCtx.globalAlpha = 0.95;
+    figCtx.drawImage(A.sheets[0], (g % A.sheetCols) * CELL, Math.floor(g / A.sheetCols) * CELL, CELL, CELL, c * CELL, r * CELL, CELL, CELL);
+  }
+  figCtx.globalAlpha = 1;
+}
+function drawFigureSource(f) {
+  if (!modelFrames) { drawStatic(); return; }
+  const fi = pingpong(f);
+  const frames = [modelFrames[MODEL_NOISE][fi], modelFrames[MODEL_AUTOMATA][fi], modelFrames[MODEL_TRUE][fi]];
   for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
     const i = r * COLS + c, k = cellOrder[i];
     let look;
@@ -366,10 +455,6 @@ function drawFigure(f) {
     figCtx.drawImage(look.sheet, (g % SHEET_COLS) * CELL, Math.floor(g / SHEET_COLS) * CELL, CELL, CELL, c * CELL, r * CELL, CELL, CELL);
   }
   figCtx.globalAlpha = 1;
-  if (hoverTask && hoverTask.cells) {
-    figCtx.strokeStyle = "#ffd23f"; figCtx.lineWidth = 2;
-    for (const k of hoverTask.cells) { const { r, c } = bodyCells[k]; figCtx.strokeRect(c * CELL + 1, r * CELL + 1, CELL - 2, CELL - 2); }
-  }
 }
 
 // Contour of the fill level b: edges between cells with order < b and body cells with order >= b.
@@ -532,8 +617,10 @@ function blitCell(ctx, look, g, x, y) {
 function drawStrip(f) {
   if (!stripLayout) return;
   const { wide, dpr, w, h, x0 } = stripLayout;
-  const fi = pingpong(f);
-  const frames = [modelFrames[MODEL_NOISE][fi], modelFrames[MODEL_AUTOMATA][fi], modelFrames[MODEL_TRUE][fi]];
+  const haveFrames = !!modelFrames;
+  const fi = haveFrames ? pingpong(f) : 0;
+  const frames = haveFrames ? [modelFrames[MODEL_NOISE][fi], modelFrames[MODEL_AUTOMATA][fi], modelFrames[MODEL_TRUE][fi]] : null;
+  if (glyphStyle === "source" && !haveFrames) return;
   sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   sctx.clearRect(0, 0, w, h);
   sctx.textBaseline = "top";
@@ -553,9 +640,16 @@ function drawStrip(f) {
       const cells = t.strip.cells, first = cells[0], last = cells[cells.length - 1];
       cells.forEach(({ x, y, k }, j) => {
         let look, g;
-        if (k == null) { look = { model: MODEL_NOISE, sheet: sheetNight, alpha: 0.5 }; g = frames[MODEL_NOISE][(j * 37 + t.id.charCodeAt(4) * 11) % (ROWS * COLS)]; }
-        else { look = cellLook(k, f); const { r, c } = bodyCells[k]; g = frames[look.model][body.source ? body.source[k] : r * COLS + c]; }
-        blitCell(sctx, look, g, x, y);
+        if (glyphStyle !== "source") {
+          const tl = k == null ? ringTile(j * 37 + t.id.charCodeAt(4) * 11, j % 4, f) : glyphTile(k, f);
+          sctx.globalAlpha = tl.alpha;
+          sctx.drawImage(tl.sheet, tl.sx, tl.sy, CELL, CELL, x, y, S.cell, S.cell);
+          sctx.globalAlpha = 1;
+        } else {
+          if (k == null) { look = { model: MODEL_NOISE, sheet: sheetNight, alpha: 0.5 }; g = frames[MODEL_NOISE][(j * 37 + t.id.charCodeAt(4) * 11) % (ROWS * COLS)]; }
+          else { look = cellLook(k, f); const { r, c } = bodyCells[k]; g = frames[look.model][body.source ? body.source[k] : r * COLS + c]; }
+          blitCell(sctx, look, g, x, y);
+        }
         if (t.pocket || t.salient) {
           sctx.strokeStyle = t.pocket ? "#dd0000" : "#8fd3ff"; sctx.lineWidth = 1;
           sctx.beginPath(); sctx.moveTo(x, y + S.cell); sctx.lineTo(x + S.cell, y); sctx.stroke();
@@ -659,12 +753,24 @@ window.addEventListener("error", e => showError(e.message || String(e)));
 window.addEventListener("unhandledrejection", e => showError((e.reason && e.reason.message) || String(e.reason)));
 
 // ── Figure selection ─────────────────────────────────────────────────────
-const FIGURES = ["human", "dog", "dog_ground"];
+const FIGURES = ["lab_front", "lab_back", "dog", "dog_ground", "human"];
+const STYLES = ["typed", "circles", "source"];
 function currentFigure() {
   const q = params.get("figure"); if (FIGURES.includes(q)) return q;
   try { const s = localStorage.getItem("figure"); if (FIGURES.includes(s)) return s; } catch (e) {}
-  return "dog_ground";
+  return "lab_front";
 }
+function currentStyle() {
+  const q = params.get("style"); if (STYLES.includes(q)) return q;
+  try { const s = localStorage.getItem("style"); if (STYLES.includes(s)) return s; } catch (e) {}
+  return "typed";
+}
+function setStyle(name) {
+  glyphStyle = name;
+  try { localStorage.setItem("style", name); } catch (e) {}
+  document.querySelectorAll("#styleSel span").forEach(el => el.classList.toggle("on", el.dataset.s === name));
+}
+document.querySelectorAll("#styleSel span").forEach(el => el.addEventListener("click", () => setStyle(el.dataset.s)));
 async function loadFigure(name) {
   body = await loadJSON(`data/body_${name}.json`);
   ROWS = body.rows; COLS = body.cols;
@@ -685,21 +791,23 @@ async function refreshProgress(force) {
   } catch (e) { console.error(e); document.getElementById("cUpdated").innerHTML = `<span class="stale">NO DATA · ${e.message}</span>`; }
 }
 function tick(now) {
-  if (M && now - lastTick >= FRAME_MS) { lastTick = now; frameIdx++; drawFigure(frameIdx); drawStrip(frameIdx); }
+  if (M && ALPHA && now - lastTick >= FRAME_MS) { lastTick = now; frameIdx++; drawFigure(frameIdx); drawStrip(frameIdx); }
   requestAnimationFrame(tick);
 }
 (async () => {
   try {
     [sheetDay, sheetNight] = await Promise.all([loadImage("glyphs.png"), loadImage("glyphs_night.png")]);
+    await loadAlphabets();
+    setStyle(currentStyle());
     await loadFigure(currentFigure());
     await refreshProgress(true);
+    requestAnimationFrame(tick);
   } catch (e) { showError(e.message); return; }
   setInterval(() => refreshProgress(false), REFRESH_MS);
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") refreshProgress(false); });
   let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { if (M) { layoutStrip(); buildOverlay(); if (!modelFrames) drawStatic(); } }, 150); });
   try {
     await loadFrames();
-    requestAnimationFrame(tick);
   } catch (e) {
     console.error(e); drawStatic();
     document.getElementById("fNote").textContent = "STATIC RENDER · FRAMES UNAVAILABLE · " + e.message;
